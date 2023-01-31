@@ -2,6 +2,7 @@
   "name": "aws-cron-events-show",
   "version": "1.0.0",
   "private": false,
+  "homepage":"https://gharibyan.github.io/aws-cron-events-show/",
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
     "@testing-library/jest-dom": "^5.16.5",
