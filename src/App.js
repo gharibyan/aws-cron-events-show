@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {generateUpcomingDates} from 'aws-cron-expression-validator'
-import {Button, Space, Input, List, Card, Row, Col, Alert} from "antd";
+import {Button, Space, Input, List, Card, Row, Col, Alert} from 'antd'
+import {GithubOutlined} from '@ant-design/icons'
 import 'antd/dist/reset.css';
 import './App.css';
 
@@ -58,7 +59,9 @@ function App() {
                         setCronExpression(result)
                     }}>
                         Submit
-                    </Button>
+                    </Button>,
+                    <Button type={'link'} href={'https://github.com/gharibyan/aws-cron-events-show'}
+                            icon={<GithubOutlined/>}/>
                 ]}>
                     <Input.Group size="large">
                         <Row gutter={12} align={'center'}>
