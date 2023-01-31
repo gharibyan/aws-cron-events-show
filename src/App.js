@@ -1,64 +1,92 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { generateUpcomingDates } from 'aws-cron-expression-validator'
-import { Button, Space, Input, List, Typography, Card } from "antd";
+import React, {useState, useEffect, useRef} from 'react';
+import {generateUpcomingDates} from 'aws-cron-expression-validator'
+import {Button, Space, Input, List, Card, Row, Col, Alert} from "antd";
 import 'antd/dist/reset.css';
 import './App.css';
 
 function App() {
-  const ref = useRef()
-  const [cronExpression, setCronExpression] = useState('0 12 ? * MON-FRI *')
-  const [results, setResults] = useState([])
-  const [error, setError] = useState('')
-  useEffect(()=>{
-    console.log(cronExpression)
-    if(!cronExpression) return
-    setError('')
-    try{
-      const dates = generateUpcomingDates(cronExpression)
-      console.log(dates)
-      setResults(dates)
-    }
-    catch(error){
-      console.log(error)
-      setError(error.message)
-    }
-  }, [cronExpression])
+    const minuteRef = useRef()
+    const hourRef = useRef()
+    const dayOfMonth = useRef()
+    const monthRef = useRef()
+    const dayOfWeekRef = useRef()
+    const yearRef = useRef()
+    const inputs = [{
+        name: 'Minutes',
+        ref: minuteRef
+    }, {
+        name: 'Hours',
+        ref: hourRef
+    }, {
+        name: 'Day of month',
+        ref: dayOfMonth
+    }, {
+        name: 'Month',
+        ref: monthRef
+    }, {
+        name: 'Day of week',
+        ref: dayOfWeekRef
+    }, {
+        name: 'Year',
+        ref: yearRef
+    }]
+    const [cronExpression, setCronExpression] = useState('')
+    const [results, setResults] = useState([])
+    const [error, setError] = useState('')
+    useEffect(() => {
+        if (!cronExpression) return
+        setError('')
+        try {
+            const dates = generateUpcomingDates(cronExpression)
+            setResults(dates.map(d => d.toString()))
+        } catch (error) {
+            setError(error.message)
+        }
+    }, [cronExpression])
 
-  return (
-    <div className="App">
-      <Space
-        direction="vertical"
-        size="middle"
-        style={{
-          display: 'flex',
-        }}
-      >
-        <Card>
-        <p>
-          <Input ref={ref} defaultValue={cronExpression} placeholder="0 12 ? * MON-FRI *" /></p>
-        <p>
-            <Button type="primary" onClick={(e)=>{
-              setCronExpression(ref.current.input.value)
-            }}>
-              Submit
-            </Button>
-        </p>
-        </Card>
-        <Card>
-        {error &&  <Typography.Text type="danger">{error}</Typography.Text>}
-        {results.length > 0 && <List
-          bordered
-          dataSource={results}
-          renderItem={(item) => (
-            <List.Item>
-              <Typography.Text mark>[ITEM]</Typography.Text> {item}
-            </List.Item>
-          )}
-        />}
-        </Card>
-      </Space>
-    </div>
-  );
+    return (
+        <div className="App">
+            <Space size={'large'} align={'center'}>
+                <Card title={
+                    <>
+                        <h3>Cron Expression</h3>
+                        <h5>Define the cron expression for validation</h5>
+                    </>
+                } actions={[
+                    <Button type="primary" onClick={() => {
+                        const result = inputs.map(i => i.ref.current.input.value.trim()).join(' ')
+                        setCronExpression(result)
+                    }}>
+                        Submit
+                    </Button>
+                ]}>
+                    <Input.Group size="large">
+                        <Row gutter={12} align={'center'}>
+                            {inputs.map((val, key) => {
+                                return (
+                                    <Col key={key} span={2}>
+                                        <Input ref={val.ref} placeholder={val.name}/>
+                                    </Col>
+                                )
+                            })}
+                        </Row>
+                    </Input.Group>
+                    <br/>
+                    {error && <Alert message={error} type="error"/>}
+                    {results.length > 0 && <List
+                        header={<h3>Next 10 scheduled dates</h3>}
+                        bordered
+                        dataSource={results}
+                        renderItem={(item) => (
+                            <List.Item>
+                                {item}
+                            </List.Item>
+                        )}
+                    />}
+                </Card>
+            </Space>
+        </div>
+    );
 }
 
 export default App;
